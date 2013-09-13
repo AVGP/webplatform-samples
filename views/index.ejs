@@ -103,7 +103,7 @@
 </div>
 <div class="right">
   <button id="start_button" onclick="startButton(event)">
-    <img id="start_img" src="webspeechdemo/mic.gif" alt="Start"></button>
+    <img id="start_img" src="mic.gif" alt="Start"></button>
 </div>
 <div id="results">
   <span id="final_span" class="final"></span>
@@ -233,17 +233,17 @@ if (!('webkitSpeechRecognition' in window)) {
   recognition.onstart = function() {
     recognizing = true;
     showInfo('info_speak_now');
-    start_img.src = 'webspeechdemo/mic-animate.gif';
+    start_img.src = 'mic-animate.gif';
   };
 
   recognition.onerror = function(event) {
     if (event.error == 'no-speech') {
-      start_img.src = 'webspeechdemo/mic.gif';
+      start_img.src = 'mic.gif';
       showInfo('info_no_speech');
       ignore_onend = true;
     }
     if (event.error == 'audio-capture') {
-      start_img.src = 'webspeechdemo/mic.gif';
+      start_img.src = 'mic.gif';
       showInfo('info_no_microphone');
       ignore_onend = true;
     }
@@ -262,7 +262,7 @@ if (!('webkitSpeechRecognition' in window)) {
     if (ignore_onend) {
       return;
     }
-    start_img.src = 'webspeechdemo/mic.gif';
+    start_img.src = 'mic.gif';
     if (!final_transcript) {
       showInfo('info_start');
       return;
@@ -270,8 +270,15 @@ if (!('webkitSpeechRecognition' in window)) {
     showInfo('');
     
     var xhr = new XMLHttpRequest();
-    xhr.onload = function() { console.log(this.responseText); };
-    xhr.open('get', 'https://api.wit.ai/message?q' + encodeURIComponent(document.getElementById('final_span').innerHTML), true);
+    xhr.onload = function() { 
+      console.log(this.responseText);
+      var result = JSON.parse(this.responseText).outcome;
+
+      if(result.intent === "send_money") {
+        alert("Okay, I will send " + result.entities.amount.value + " " + result.entities.currency.value + " to " + result.entities.receipient.value);
+      }
+    };
+    xhr.open('get', 'http://localhost:8000/wit/' + encodeURIComponent(document.getElementById('final_span').innerHTML), true);
     xhr.setRequestHeader('Authorization', 'Bearer LC5I6ROHQ6T2R2KCQROTO6NMMPB5PTNN');
     xhr.send();
     
@@ -365,7 +372,7 @@ function startButton(event) {
   ignore_onend = false;
   final_span.innerHTML = '';
   interim_span.innerHTML = '';
-  start_img.src = 'webspeechdemo/mic-slash.gif';
+  start_img.src = 'mic-slash.gif';
   showInfo('info_allow');
   showButtons('none');
   start_timestamp = event.timeStamp;
