@@ -269,9 +269,16 @@ if (!('webkitSpeechRecognition' in window)) {
     }
     showInfo('');
     
-    var xhr = new XmlHttpRequest();
-    xhr.onload = function() { console.log(this.responseText); };
-    xhr.open('get', 'https://api.wit.ai/message?q' + encodeURIComponent(document.getElementById('final_span').innerHTML), true);
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function() { 
+      console.log(this.responseText);
+      var result = JSON.parse(this.responseText).outcome;
+
+      if(result.intent === "send_money") {
+        alert("Okay, I will send " + result.entities.amount.value + " " + result.entities.currency.value + " to " + result.entities.receipient.value);
+      }
+    };
+    xhr.open('get', 'http://localhost:8000/wit/' + encodeURIComponent(document.getElementById('final_span').innerHTML), true);
     xhr.setRequestHeader('Authorization', 'Bearer LC5I6ROHQ6T2R2KCQROTO6NMMPB5PTNN');
     xhr.send();
     
